@@ -51,6 +51,8 @@ class ControlWidget(QWidget):
             
         #! Initialize Lock Button *******************************************
         self.lockButton = LockButton()
+        self.lockButton.clicked.connect(self.lockButtonPressed)
+        self.lockButtonPressed()
 
         #! Initialize Power Button ******************************************
         self.powerButton = PowerButton()
@@ -86,29 +88,37 @@ class ControlWidget(QWidget):
         self.mainGridLayout.addWidget(self.powerButton, 3, 0)
         self.mainGridLayout.addWidget(self.fireButton, 3, 2)
 
+    def lockButtonPressed(self):
+        if self.lockButton.lock == True:
+            self.upButton.setEnabled(False)
+            self.downButton.setEnabled(False)
+            self.leftButton.setEnabled(False)
+            self.rightButton.setEnabled(False)
+        elif self.lockButton.lock == False:
+            self.upButton.setEnabled(True)
+            self.downButton.setEnabled(True)
+            self.leftButton.setEnabled(True)
+            self.rightButton.setEnabled(True)
+
     def upButtonPressed(self):
-        if self.lockButton.lock == False:
-            GPIO.output(self.servo_1_dir_neg, GPIO.HIGH)
-            GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
-            GPIO.output(self.servo_1_step_neg, GPIO.LOW)
+        GPIO.output(self.servo_1_dir_neg, GPIO.HIGH)
+        GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
+        GPIO.output(self.servo_1_step_neg, GPIO.LOW)
 
     def downButtonPressed(self):
-        if self.lockButton.lock == False:
-            GPIO.output(self.servo_1_dir_neg, GPIO.LOW)
-            GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
-            GPIO.output(self.servo_1_step_neg, GPIO.LOW)
+        GPIO.output(self.servo_1_dir_neg, GPIO.LOW)
+        GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
+        GPIO.output(self.servo_1_step_neg, GPIO.LOW)
 
     def leftButtonPressed(self):
-        if self.lockButton.lock == False:
-            GPIO.output(self.servo_2_dir_neg, GPIO.HIGH)
-            GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
-            GPIO.output(self.servo_2_step_neg, GPIO.LOW)
+        GPIO.output(self.servo_2_dir_neg, GPIO.HIGH)
+        GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
+        GPIO.output(self.servo_2_step_neg, GPIO.LOW)
 
     def rightButtonPressed(self):
-        if self.lockButton.lock == False:
-            GPIO.output(self.servo_2_dir_neg, GPIO.LOW)
-            GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
-            GPIO.output(self.servo_2_step_neg, GPIO.LOW)
+        GPIO.output(self.servo_2_dir_neg, GPIO.LOW)
+        GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
+        GPIO.output(self.servo_2_step_neg, GPIO.LOW)
 
     def powerButtonPressed(self):
         buttonState = self.powerButton.state
