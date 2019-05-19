@@ -117,6 +117,7 @@ class ControlWidget(QWidget):
     def downButtonPressed(self):
         GPIO.setup(self.servo_1_dir_neg, GPIO.LOW)
         GPIO.setup(self.servo_1_step_neg, GPIO.HIGH)
+        time.sleep(0.0001)
         GPIO.setup(self.servo_1_step_neg, GPIO.LOW)
 
     def leftButtonPressed(self):
@@ -177,7 +178,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     obj = ControlWidget()
     obj.show()
-    GPIO.cleanup()
     sys.exit(app.exec_())
 
     ########################################################
