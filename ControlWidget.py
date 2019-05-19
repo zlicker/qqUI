@@ -1,6 +1,7 @@
-#! /home/zlicker/anaconda3/bin/python
 import sys
 import RPi.GPIO as GPIO
+import time
+from threading import Thread
 #sys.path.append('./qqUI/CustomButton/')
 
 from PyQt5.QtCore import *
@@ -25,6 +26,9 @@ class ControlWidget(QWidget):
         self.initButtons()
 
         self.createLayout()
+        
+        #t = Thread(target=self.runAuto)
+        #t.start()
 
     def initButtons(self):
         #! init Direction Buttons *******************************************
@@ -65,7 +69,7 @@ class ControlWidget(QWidget):
         # Disable other buttons.
         self.lockButtonPressed()
 
-    def setButtonProperty(self, pb=QPushButton):
+    def setButtonProperty(self, pb):
         iconXSize = 100
         iconYSize = 100
         buttonXSize = 100
@@ -73,11 +77,11 @@ class ControlWidget(QWidget):
 
         #pb.setCheckable(True)
         pb.setFlat(True)
-        pb.setStyleSheet("QToolButton{border-style: flat;}")
+        #pb.setStyleSheet("QToolButton{border-style: flat;}")
         pb.setIconSize(QSize(iconXSize, iconYSize))
         pb.setFixedSize(buttonXSize, buttonYSize)
         pb.setAutoRepeat(True)
-        pb.setAutoRepeatInterval(1e-3)
+        pb.setAutoRepeatInterval(0.0000001)
         
     def createLayout(self):
         self.mainGridLayout.addWidget(self.upButton, 0, 1)
@@ -105,24 +109,26 @@ class ControlWidget(QWidget):
             self.fireButton.setEnabled(True)
 
     def upButtonPressed(self):
-        GPIO.output(self.servo_1_dir_neg, GPIO.HIGH)
-        GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
-        GPIO.output(self.servo_1_step_neg, GPIO.LOW)
+        GPIO.setup(self.servo_1_dir_neg, 1)
+        GPIO.setup(self.servo_1_step_neg, 1)
+        time.sleep(0.0001)
+        GPIO.setup(self.servo_1_step_neg, 0)
 
     def downButtonPressed(self):
-        GPIO.output(self.servo_1_dir_neg, GPIO.LOW)
-        GPIO.output(self.servo_1_step_neg, GPIO.HIGH)
-        GPIO.output(self.servo_1_step_neg, GPIO.LOW)
+        GPIO.setup(self.servo_1_dir_neg, GPIO.LOW)
+        GPIO.setup(self.servo_1_step_neg, GPIO.HIGH)
+        GPIO.setup(self.servo_1_step_neg, GPIO.LOW)
 
     def leftButtonPressed(self):
-        GPIO.output(self.servo_2_dir_neg, GPIO.HIGH)
-        GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
-        GPIO.output(self.servo_2_step_neg, GPIO.LOW)
+        GPIO.setup(self.servo_2_dir_neg, GPIO.HIGH)
+        GPIO.setup(self.servo_2_step_neg, GPIO.HIGH)
+        time.sleep(0.0001)
+        GPIO.setup(self.servo_2_step_neg, GPIO.LOW)
 
     def rightButtonPressed(self):
-        GPIO.output(self.servo_2_dir_neg, GPIO.LOW)
-        GPIO.output(self.servo_2_step_neg, GPIO.HIGH)
-        GPIO.output(self.servo_2_step_neg, GPIO.LOW)
+        GPIO.setup(self.servo_2_dir_neg, GPIO.LOW)
+        GPIO.setup(self.servo_2_step_neg, GPIO.HIGH)
+        GPIO.setup(self.servo_2_step_neg, GPIO.LOW)
 
     def powerButtonPressed(self):
         buttonState = self.powerButton.state
@@ -148,7 +154,7 @@ class ControlWidget(QWidget):
         self.relay_id = 9
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
+        GPIO.setwarnings(True)
 
         GPIO.setup(self.servo_1_step_neg, GPIO.OUT)
         GPIO.setup(self.servo_1_dir_neg, GPIO.OUT)
@@ -157,12 +163,21 @@ class ControlWidget(QWidget):
         GPIO.setup(self.power_id, GPIO.OUT)
         GPIO.setup(self.relay_id, GPIO.OUT)
 
+    def runAuto(self):
+        for i in range(100000):
+            GPIO.setup(self.servo_1_step_neg, 1)
+            GPIO.setup(self.servo_1_dir_neg, 1)
+            time.sleep(0.00001)
+            GPIO.setup(self.servo_1_step_neg, 0)
+            time.sleep(0.00001)
+
         
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     obj = ControlWidget()
     obj.show()
+    GPIO.cleanup()
     sys.exit(app.exec_())
 
     ########################################################
