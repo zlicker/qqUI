@@ -1,6 +1,6 @@
 #! /home/zlicker/anaconda3/bin/python
 import sys
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 #sys.path.append('./qqUI/CustomButton/')
 
 from PyQt5.QtCore import *
@@ -21,7 +21,7 @@ class ControlWidget(QWidget):
         self.setLayout(self.mainGridLayout)
         self.resize(700, 400)
 
-        #self.initGPIO()
+        self.initGPIO()
         self.initButtons()
 
         self.createLayout()
