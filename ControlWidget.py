@@ -52,7 +52,6 @@ class ControlWidget(QWidget):
         #! Initialize Lock Button *******************************************
         self.lockButton = LockButton()
         self.lockButton.clicked.connect(self.lockButtonPressed)
-        self.lockButtonPressed()
 
         #! Initialize Power Button ******************************************
         self.powerButton = PowerButton()
@@ -62,6 +61,9 @@ class ControlWidget(QWidget):
         self.fireButton = FireButton()
         self.fireButton.pressed.connect(self.fireButtonPressed)
         self.fireButton.released.connect(self.fireButtonReleased)
+
+        # Disable other buttons.
+        self.lockButtonPressed()
 
     def setButtonProperty(self, pb=QPushButton):
         iconXSize = 100
@@ -94,11 +96,13 @@ class ControlWidget(QWidget):
             self.downButton.setEnabled(False)
             self.leftButton.setEnabled(False)
             self.rightButton.setEnabled(False)
+            self.fireButton.setEnabled(False)
         elif self.lockButton.lock == False:
             self.upButton.setEnabled(True)
             self.downButton.setEnabled(True)
             self.leftButton.setEnabled(True)
             self.rightButton.setEnabled(True)
+            self.fireButton.setEnabled(True)
 
     def upButtonPressed(self):
         GPIO.output(self.servo_1_dir_neg, GPIO.HIGH)
