@@ -8,8 +8,8 @@ class VelocitySlider(QSlider):
 
     def __init__(self, *args, **kwargs):
         super(VelocitySlider, self).__init__(*args, **kwargs)
-        self.setMinimum(100)
-        self.setMaximum(10000)
+        self.setMinimum(1)
+        self.setMaximum(100)
 
         #self.setStyleFunc()
         def setStyleFunc(self):

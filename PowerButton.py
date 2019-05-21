@@ -48,6 +48,6 @@ class PowerButton(QToolButton):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    obj = LockButton()
+    obj = PowerButton()
     obj.show()
     sys.exit(app.exec_())

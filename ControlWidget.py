@@ -1,5 +1,5 @@
 import sys
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
 
 from PyQt5.QtCore import *
@@ -21,7 +21,7 @@ class ControlWidget(QWidget):
         self.setLayout(self.mainGridLayout)
         self.resize(600, 400)
 
-        #self.initGPIO()
+        self.initGPIO()
         self.initButtons()
 
         self.createLayout()
@@ -49,6 +49,10 @@ class ControlWidget(QWidget):
         for pb in (self.upButton, self.leftButton,
         self.rightButton, self.downButton):
             self.setButtonProperty(pb)
+        self.upButton.setAutoRepeatInterval(0.1)
+        self.downButton.setAutoRepeatInterval(0.999999)
+        self.leftButton.setAutoRepeatInterval(1e-3)
+        self.rightButton.setAutoRepeatInterval(1)
 
         #! Initialize the Velocity Slider ***********************************
         self.verticalVelSlider = VelocitySlider()
@@ -84,7 +88,7 @@ class ControlWidget(QWidget):
         pb.setIconSize(QSize(iconXSize, iconYSize))
         pb.setFixedSize(buttonXSize, buttonYSize)
         pb.setAutoRepeat(True)
-        pb.setAutoRepeatInterval(0.0000001)
+        #pb.setAutoRepeatInterval(1)
         
     def createLayout(self):
         self.mainGridLayout.addWidget(self.verticalVelSlider, 0, 0, 3, 1, Qt.AlignHCenter)
@@ -117,25 +121,30 @@ class ControlWidget(QWidget):
     def upButtonPressed(self):
         GPIO.setup(self.servo_1_dir_neg, 1)
         GPIO.setup(self.servo_1_step_neg, 1)
-        time.sleep(self.verticalVelocity)
+        #time.sleep(5e-3)
+
+        #time.sleep(self.verticalVelocity)
         GPIO.setup(self.servo_1_step_neg, 0)
 
     def downButtonPressed(self):
         GPIO.setup(self.servo_1_dir_neg, GPIO.LOW)
         GPIO.setup(self.servo_1_step_neg, GPIO.HIGH)
-        time.sleep(self.verticalVelocity)
+        #time.sleep(1e-7)
+        # Minimize = 1e-4
+        #time.sleep(self.verticalVelocity)
         GPIO.setup(self.servo_1_step_neg, GPIO.LOW)
 
     def leftButtonPressed(self):
         GPIO.setup(self.servo_2_dir_neg, GPIO.HIGH)
         GPIO.setup(self.servo_2_step_neg, GPIO.HIGH)
-        time.sleep(self.horizontalVelocity)
+        time.sleep(1e-3)
+        #time.sleep(self.horizontalVelocity)
         GPIO.setup(self.servo_2_step_neg, GPIO.LOW)
 
     def rightButtonPressed(self):
         GPIO.setup(self.servo_2_dir_neg, GPIO.LOW)
         GPIO.setup(self.servo_2_step_neg, GPIO.HIGH)
-        time.sleep(self.horizontalVelocity)
+        #time.sleep(self.horizontalVelocity)
         GPIO.setup(self.servo_2_step_neg, GPIO.LOW)
 
     def powerButtonPressed(self):
@@ -153,18 +162,22 @@ class ControlWidget(QWidget):
 
     def verticalVelChanged(self):
         self.verticalVelocity = 1 / self.verticalVelSlider.value()
+        #self.upButton.setAutoRepeatInterval(self.verticalVelocity)
+        #self.downButton.setAutoRepeatInterval(self.verticalVelocity)
 
     def horizontalVelChanged(self):
         self.horizontalVelocity = 1 / self.horziontalVelSlider.value()
+        #self.leftButton.setAutoRepeatInterval(self.horizontalVelocity)
+        #self.rightButton.setAutoRepeatInterval(self.horizontalVelocity)
 
     def initGPIO(self):
-        self.servo_1_step_neg = 2
+        self.servo_1_step_neg = 2	
         self.servo_1_dir_neg = 3
         self.servo_2_step_neg = 17
         self.servo_2_dir_neg = 27
 
-        self.power_id = 9
-        self.relay_id = 10
+        self.power_id = 10
+        self.relay_id = 9
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(True)
