@@ -1,6 +1,7 @@
 import sys
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import time
+from threading import Thread
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -21,8 +22,11 @@ class ControlWidget(QWidget):
         self.setLayout(self.mainGridLayout)
         self.resize(600, 400)
 
-        self.initGPIO()
+        #self.initGPIO()
         self.initButtons()
+
+        t = Thread(target=self.runMotor)
+        t.start()
 
         self.createLayout()
 
@@ -34,10 +38,10 @@ class ControlWidget(QWidget):
         self.rightButton = QPushButton('')
 
 
-        self.upButton.pressed.connect(self.upButtonPressed)
-        self.downButton.pressed.connect(self.downButtonPressed)
-        self.leftButton.pressed.connect(self.leftButtonPressed)
-        self.rightButton.pressed.connect(self.rightButtonPressed)
+        #self.upButton.pressed.connect(self.upButtonPressed)
+        #self.downButton.pressed.connect(self.downButtonPressed)
+        #self.leftButton.pressed.connect(self.leftButtonPressed)
+        #self.rightButton.pressed.connect(self.rightButtonPressed)
 
         imagePath = './images/'
 
@@ -49,10 +53,6 @@ class ControlWidget(QWidget):
         for pb in (self.upButton, self.leftButton,
         self.rightButton, self.downButton):
             self.setButtonProperty(pb)
-        self.upButton.setAutoRepeatInterval(0.1)
-        self.downButton.setAutoRepeatInterval(0.999999)
-        self.leftButton.setAutoRepeatInterval(1e-3)
-        self.rightButton.setAutoRepeatInterval(1)
 
         #! Initialize the Velocity Slider ***********************************
         self.verticalVelSlider = VelocitySlider()
@@ -87,7 +87,7 @@ class ControlWidget(QWidget):
         #pb.setStyleSheet("QToolButton{border-style: flat;}")
         pb.setIconSize(QSize(iconXSize, iconYSize))
         pb.setFixedSize(buttonXSize, buttonYSize)
-        pb.setAutoRepeat(True)
+        #pb.setAutoRepeat(True)
         #pb.setAutoRepeatInterval(1)
         
     def createLayout(self):
@@ -103,6 +103,30 @@ class ControlWidget(QWidget):
 
         self.mainGridLayout.addWidget(self.powerButton, 3, 1, 1, 2)
         self.mainGridLayout.addWidget(self.fireButton, 3, 3, 1, 2)
+
+    def runMotor(self):
+        while True:
+            if self.upButton.isDown():
+                GPIO.setup(self.servo_1_dir_neg, 0)
+                GPIO.setup(self.servo_1_step_neg, 1)
+                time.sleep(1e-3)
+                GPIO.setup(self.servo_1_step_neg, 0)
+            elif self.downButton.isDown():
+                GPIO.setup(self.servo_1_dir_neg, 1)
+                GPIO.setup(self.servo_1_step_neg, 1)
+                time.sleep(1)
+                GPIO.setup(self.servo_1_step_neg, 0)
+            elif self.leftButton.isDown():
+                GPIO.setup(self.servo_2_dir_neg, 1)
+                GPIO.setup(self.servo_2_step_neg, 1)
+                time.sleep(1e-3)
+                GPIO.setup(self.servo_2_step_neg, 0)
+            elif self.rightButton.isDown():
+                GPIO.setup(self.servo_2_dir_neg, 0)
+                GPIO.setup(self.servo_2_step_neg, 1)
+                time.sleep(1e-3)
+                GPIO.setup(self.servo_2_step_neg, 0)
+
 
     def lockButtonPressed(self):
         if self.lockButton.lock == True:
@@ -122,15 +146,11 @@ class ControlWidget(QWidget):
         GPIO.setup(self.servo_1_dir_neg, 1)
         GPIO.setup(self.servo_1_step_neg, 1)
         #time.sleep(5e-3)
-
-        #time.sleep(self.verticalVelocity)
         GPIO.setup(self.servo_1_step_neg, 0)
 
     def downButtonPressed(self):
         GPIO.setup(self.servo_1_dir_neg, GPIO.LOW)
         GPIO.setup(self.servo_1_step_neg, GPIO.HIGH)
-        #time.sleep(1e-7)
-        # Minimize = 1e-4
         #time.sleep(self.verticalVelocity)
         GPIO.setup(self.servo_1_step_neg, GPIO.LOW)
 
