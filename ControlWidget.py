@@ -1,6 +1,5 @@
-#! /home/zlicker/anaconda3/bin/python
 import sys
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
 from threading import Thread
 
@@ -23,7 +22,7 @@ class ControlWidget(QWidget):
         self.setLayout(self.mainGridLayout)
         self.resize(600, 400)
 
-        #self.initGPIO()
+        self.initGPIO()
         self.initButtons()
 
         t = Thread(target=self.runMotor)
@@ -57,9 +56,18 @@ class ControlWidget(QWidget):
 
         #! Initialize the Velocity Slider ***********************************
         self.verticalVelSlider = VelocitySlider()
-        self.horziontalVelSlider = VelocitySlider()
+        self.verticalVelSlider.setMinimum(5000)
+        self.verticalVelSlider.setMaximum(100000)
+        self.verticalVelSlider.setValue(50000)
+        self.verticalVelocity = 1 / self.verticalVelSlider.value()
         self.verticalVelSlider.valueChanged.connect(self.verticalVelChanged)
-        self.horziontalVelSlider.valueChanged.connect(self.horizontalVelChanged)
+
+        self.horizontalVelSlider = VelocitySlider()
+        self.horizontalVelSlider.setMinimum(1000)
+        self.horizontalVelSlider.setMaximum(20000)
+        self.horizontalVelSlider.setValue(10000)
+        self.horizontalVelocity = 1 / self.horizontalVelSlider.value()
+        self.horizontalVelSlider.valueChanged.connect(self.horizontalVelChanged)
             
         #! Initialize Lock Button *******************************************
         self.lockButton = LockButton()
@@ -93,7 +101,7 @@ class ControlWidget(QWidget):
         
     def createLayout(self):
         self.mainGridLayout.addWidget(self.verticalVelSlider, 0, 0, 3, 1, Qt.AlignHCenter)
-        self.mainGridLayout.addWidget(self.horziontalVelSlider, 0, 4, 3, 1, Qt.AlignHCenter)
+        self.mainGridLayout.addWidget(self.horizontalVelSlider, 0, 4, 3, 1, Qt.AlignHCenter)
 
         self.mainGridLayout.addWidget(self.upButton, 0, 2)
         self.mainGridLayout.addWidget(self.leftButton, 1, 1)
@@ -110,22 +118,26 @@ class ControlWidget(QWidget):
             if self.upButton.isDown():
                 GPIO.setup(self.servo_1_dir_neg, 0)
                 GPIO.setup(self.servo_1_step_neg, 1)
-                time.sleep(1e-3)
+                #time.sleep(1e-5)
+                time.sleep(self.verticalVelocity)
                 GPIO.setup(self.servo_1_step_neg, 0)
             elif self.downButton.isDown():
                 GPIO.setup(self.servo_1_dir_neg, 1)
                 GPIO.setup(self.servo_1_step_neg, 1)
-                time.sleep(1)
+                #time.sleep(2e-4)
+                time.sleep(self.verticalVelocity)
                 GPIO.setup(self.servo_1_step_neg, 0)
             elif self.leftButton.isDown():
                 GPIO.setup(self.servo_2_dir_neg, 1)
                 GPIO.setup(self.servo_2_step_neg, 1)
-                time.sleep(1e-3)
+                #time.sleep(1e-5)
+                time.sleep(self.horizontalVelocity)
                 GPIO.setup(self.servo_2_step_neg, 0)
             elif self.rightButton.isDown():
                 GPIO.setup(self.servo_2_dir_neg, 0)
                 GPIO.setup(self.servo_2_step_neg, 1)
-                time.sleep(1e-3)
+                #time.sleep(1e-3)
+                time.sleep(self.horizontalVelocity)
                 GPIO.setup(self.servo_2_step_neg, 0)
 
 
@@ -183,13 +195,9 @@ class ControlWidget(QWidget):
 
     def verticalVelChanged(self):
         self.verticalVelocity = 1 / self.verticalVelSlider.value()
-        #self.upButton.setAutoRepeatInterval(self.verticalVelocity)
-        #self.downButton.setAutoRepeatInterval(self.verticalVelocity)
 
     def horizontalVelChanged(self):
-        self.horizontalVelocity = 1 / self.horziontalVelSlider.value()
-        #self.leftButton.setAutoRepeatInterval(self.horizontalVelocity)
-        #self.rightButton.setAutoRepeatInterval(self.horizontalVelocity)
+        self.horizontalVelocity = 1 / self.horizontalVelSlider.value()
 
     def initGPIO(self):
         self.servo_1_step_neg = 2	
