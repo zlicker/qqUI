@@ -25,7 +25,7 @@ class ControlWidget(QWidget):
         self.initGPIO()
         self.initButtons()
 
-        t = Thread(target=self.runMotor)
+        t = Thread(target=self.runMotor, setDaemon=True)
         t.start()
 
         self.createLayout()
